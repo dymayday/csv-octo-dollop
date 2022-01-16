@@ -1,0 +1,9 @@
+[package]
+edition = "2021"
+name = "k-coding-test"
+version = "0.1.0"
+
+[dependencies]
+serde = { version = "1.0.133", features = ["derive"] }
+csv = "1.1.6"
+num-format = "0.4.0"
