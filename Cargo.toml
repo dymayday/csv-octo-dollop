@@ -2,7 +2,7 @@
 edition = "2021"
 name = "k-coding-test"
 version = "0.1.0"
+authors = ["meidhy.demagny@gmail.com"]
 
 [dependencies]
-serde = { version = "1.0.133", features = ["derive"] }
 csv = "1.1.6"
