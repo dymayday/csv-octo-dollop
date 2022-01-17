@@ -78,11 +78,19 @@ pub fn parse_unchecked<T: Sized + std::str::FromStr>(x: &[u8]) -> Option<T> {
 /// Uses an unsafe parsing for performance reason. Implemented as a separate
 /// function in order to default to float value : 0.0.
 pub fn parse_unchecked_f32(x: &[u8]) -> Option<f32> {
-    Some(unsafe {
+    let v = unsafe {
         std::str::from_utf8_unchecked(x)
             .parse::<f32>()
             .unwrap_or_default()
-    })
+    };
+
+    if v == std::f32::NEG_INFINITY {
+        None
+    } else if v == std::f32::INFINITY {
+        None
+    } else {
+        Some(v)
+    }
 }
 
 /// Record Error implementation.
@@ -127,7 +135,26 @@ fn test_parsing_numerical_bad_record() {
 
 #[test]
 fn test_record_is_valid() {
-    let csv_row = vec!["chargeback", "  7", "3", "-10.0"];
+    let csv_row = vec!["deposit", "  7", "3", "-10.0"];
+    let mut byte_record = ByteRecord::from(csv_row);
+
+    assert!(Record::from_byterecord(&mut byte_record).is_err());
+}
+
+#[test]
+fn test_record_disallow_neg_infinity() {
+    // A -Inf parsing result should occur with value '-3.5e38'
+    // and Inf with '3.5e38'.
+    let csv_row = vec!["withdrawal", "  7", "3", "-3.5e38"];
+    let mut byte_record = ByteRecord::from(csv_row);
+
+    assert!(Record::from_byterecord(&mut byte_record).is_err());
+}
+
+#[test]
+fn test_record_disallow_infinity() {
+    // A Inf parsing result should occur with value '3.5e38'.
+    let csv_row = vec!["deposit", "  7", "3", "3.5e38"];
     let mut byte_record = ByteRecord::from(csv_row);
 
     assert!(Record::from_byterecord(&mut byte_record).is_err());

@@ -105,7 +105,6 @@ fn test_transaction_parsing() {
 fn test_bad_transaction_parsing() {
     let utt = b"Unknown_transaction_type";
     assert_eq!(TransactionKind::new(utt), None);
-
-    let empty = b"";
-    assert_eq!(TransactionKind::new(empty), None);
+    assert_eq!(TransactionKind::new(b""), None);
+    assert_eq!(TransactionKind::new(b" "), None);
 }
