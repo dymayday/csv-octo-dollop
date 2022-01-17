@@ -1,5 +1,7 @@
 # Coding test notes
 
+[![Build Status](https://app.travis-ci.com/dymayday/csv-octo-dollop.svg?branch=main)](https://app.travis-ci.com/dymayday/csv-octo-dollop)
+
 A sample data can be found in the example directory.
 
 ## Thing to discuss
