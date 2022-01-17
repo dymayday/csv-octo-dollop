@@ -2,8 +2,8 @@
 //! transactions that we need to keep track of.
 pub mod client;
 mod error;
-use client::ClientDB;
 use crate::engine::protocol::Transaction;
+use client::ClientDB;
 pub use error::{DBError, Result};
 use std::collections::BTreeMap;
 

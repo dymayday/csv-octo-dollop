@@ -9,7 +9,7 @@ pub type ClientDB = BTreeMap<u16, ClientAccountState>;
 #[derive(Debug)]
 pub struct ClientAccountState {
     available: f32,
-    /// A held value correspond to the amount of 
+    /// A held value correspond to the amount of
     /// a disputed transaction.
     held: f32,
     total: f32,
