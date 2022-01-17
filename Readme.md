@@ -1,6 +1,6 @@
 # Coding test notes
 
-[![Build Status](https://app.travis-ci.com/dymayday/csv-octo-dollop.svg?branch=main)](https://app.travis-ci.com/dymayday/csv-octo-dollop)
+[![Rust](https://github.com/dymayday/csv-octo-dollop/actions/workflows/rust.yml/badge.svg)](https://github.com/dymayday/csv-octo-dollop/actions/workflows/rust.yml)
 
 A sample data can be found in the example directory.
 
