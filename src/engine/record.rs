@@ -84,9 +84,7 @@ pub fn parse_unchecked_f32(x: &[u8]) -> Option<f32> {
             .unwrap_or_default()
     };
 
-    if v == std::f32::NEG_INFINITY {
-        None
-    } else if v == std::f32::INFINITY {
+    if v < std::f32::MIN || v > std::f32::MAX {
         None
     } else {
         Some(v)
