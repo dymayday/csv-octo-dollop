@@ -1,15 +1,26 @@
 //! Transaction protocol.
 
-// use crate::engine::record;
 use super::record::Record;
-use std::collections::BTreeMap;
 
+/// The kind of transaction we know how to process
+/// from a [`Record`].
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum TransactionKind {
+    /// Add value to a client's account.
     Deposit,
+    /// Remove value from a client's account.
     Withdrawal,
+    /// Engage a transaction to the dispute process, putting
+    /// the amount of a previous transaction in a hold state
+    /// until the dispute process is over.
     Dispute,
+    /// Resolving a disputed transaction by adding back to
+    /// the client's account, from the holding place, the
+    /// disputed transaction's amount.
     Resolve,
+    /// Resolving a dispute by removing the disputed transaction's
+    /// amount from the client's account and resulting freezing the
+    /// account.
     Chargeback,
 }
 
@@ -29,24 +40,37 @@ impl TransactionKind {
     }
 }
 
-pub type TransactionDB = BTreeMap<u32, Transaction>;
-
 #[derive(Debug)]
 pub struct Transaction {
     #[allow(dead_code)]
     kind: TransactionKind,
     client_id: u16,
     amount: f32,
-    // We might want to refactor this with an optional value.
+    disputed: bool,
+    // We might want to refactor this with an optional value
+    // to match the specs about some transaction that doesn't have
+    // an amount value. But because it will not save any space we choose
+    // to go for the easy way.
     // amount: Option<f32>,
 }
 
 impl Transaction {
+    #[allow(dead_code)]
+    pub fn new(kind: TransactionKind, client_id: u16, amount: f32) -> Self {
+        Self {
+            kind,
+            client_id,
+            amount,
+            disputed: false,
+        }
+    }
+
     pub fn from_record(record: &Record) -> Self {
         Self {
             kind: record.transaction_kind,
             client_id: record.client,
             amount: record.amount,
+            disputed: false,
         }
     }
 
@@ -56,6 +80,15 @@ impl Transaction {
 
     pub fn client_id(&self) -> u16 {
         self.client_id
+    }
+
+    // Set the dispute state of a transaction.
+    pub fn set_dispute(&mut self, b: bool) {
+        self.disputed = b;
+    }
+
+    pub fn is_in_dispute(&self) -> bool {
+        self.disputed
     }
 }
 

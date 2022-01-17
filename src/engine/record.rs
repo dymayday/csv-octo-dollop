@@ -5,7 +5,7 @@
 use super::protocol::TransactionKind;
 use csv::ByteRecord;
 
-// /// This implementation would work with Serde with no 'zero allocation'
+// /// This implementation would work with Serde with 'zero allocation'
 // /// but we choose to favor speed in this use case.
 // use serde::Deserialize;
 // #[derive(Debug, Deserialize)]
@@ -29,7 +29,7 @@ pub struct Record {
 
 impl Record {
     /// Returns a [`Record`] from a [`csv::ByteRecord`].
-    pub fn from(record: &mut ByteRecord) -> Result<Self, RecordError> {
+    pub fn from_byterecord(record: &mut ByteRecord) -> Result<Self, RecordError> {
         record.trim();
         if let (Some(txk), Some(client), Some(tx), Some(amount)) = (
             TransactionKind::new(&record[0]),
@@ -53,7 +53,6 @@ impl Record {
                 Err(RecordError::Invalid)
             }
         } else {
-            dbg!(&record);
             Err(RecordError::Parse)
         }
     }
@@ -76,6 +75,8 @@ pub fn parse_unchecked<T: Sized + std::str::FromStr>(x: &[u8]) -> Option<T> {
     }
 }
 
+/// Uses an unsafe parsing for performance reason. Implemented as a separate
+/// function in order to default to float value : 0.0.
 pub fn parse_unchecked_f32(x: &[u8]) -> Option<f32> {
     Some(unsafe {
         std::str::from_utf8_unchecked(x)
@@ -105,7 +106,7 @@ fn test_record_parsing() {
         tx: 3,
         amount: 2.0,
     };
-    assert_eq!(record, Record::from(&mut byte_record).unwrap());
+    assert_eq!(record, Record::from_byterecord(&mut byte_record).unwrap());
 }
 
 #[test]
@@ -113,7 +114,7 @@ fn test_parsing_bad_record_transaction() {
     let csv_row = vec!["rule the world", "  xxx", "3", "2.0"];
     let mut byte_record = ByteRecord::from(csv_row);
 
-    assert!(Record::from(&mut byte_record).is_err());
+    assert!(Record::from_byterecord(&mut byte_record).is_err());
 }
 
 #[test]
@@ -121,7 +122,7 @@ fn test_parsing_numerical_bad_record() {
     let csv_row = vec!["resolve", "  xxx", "3", "2.0"];
     let mut byte_record = ByteRecord::from(csv_row);
 
-    assert!(Record::from(&mut byte_record).is_err());
+    assert!(Record::from_byterecord(&mut byte_record).is_err());
 }
 
 #[test]
@@ -129,5 +130,5 @@ fn test_record_is_valid() {
     let csv_row = vec!["chargeback", "  7", "3", "-10.0"];
     let mut byte_record = ByteRecord::from(csv_row);
 
-    assert!(Record::from(&mut byte_record).is_err());
+    assert!(Record::from_byterecord(&mut byte_record).is_err());
 }

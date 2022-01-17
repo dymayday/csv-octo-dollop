@@ -9,6 +9,7 @@ use std::fmt;
 /// A type alias for `Result<T, engine::Error>`.
 pub type Result<T> = std::result::Result<T, EngineError>;
 
+#[derive(Debug)]
 pub struct EngineError(Box<EngineErrorKind>);
 
 impl EngineError {
@@ -24,12 +25,15 @@ impl EngineError {
     //     *self.0
     // }
 }
+#[derive(Debug)]
 pub enum EngineErrorKind {
     DBError(DBError),
     RecordError(RecordError),
     CsvError(CsvError),
     InvalidHeaders,
+    #[allow(dead_code)]
     NotEnoughAvailableCredit,
+    UnknownTransaction,
 }
 
 impl From<DBError> for EngineError {
@@ -60,14 +64,14 @@ impl fmt::Display for EngineError {
     /// We would need more info about the errors occuring here in a real implementation.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self.0 {
-            EngineErrorKind::DBError(ref _err) => write!(f, "Database error."),
+            EngineErrorKind::DBError(ref err) => write!(f, "Database error: {:?}", err),
             EngineErrorKind::RecordError(ref _err) => write!(f, "Record parsing error"),
-            EngineErrorKind::CsvError(ref _err) => write!(f, "CSV parse error."),
-            EngineErrorKind::InvalidHeaders => write!(f, "Invalid headers encountered."),
+            EngineErrorKind::CsvError(ref _err) => write!(f, "CSV parse error"),
+            EngineErrorKind::InvalidHeaders => write!(f, "Invalid headers encountered"),
             EngineErrorKind::NotEnoughAvailableCredit => {
-                write!(f, "Not enough available credit to withdraw.")
+                write!(f, "Not enough available credit to withdraw")
             }
-            // _ => unreachable!()
+            EngineErrorKind::UnknownTransaction => write!(f, "Unknown Transaction encountered"),
         }
     }
 }

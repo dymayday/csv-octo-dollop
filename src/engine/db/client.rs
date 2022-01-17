@@ -5,18 +5,19 @@ use std::collections::BTreeMap;
 
 pub type ClientDB = BTreeMap<u16, ClientAccountState>;
 
+/// Data structure storing all the info needed about a Client.
 #[derive(Debug)]
 pub struct ClientAccountState {
     available: f32,
+    /// A held value correspond to the amount of 
+    /// a disputed transaction.
     held: f32,
     total: f32,
     locked: bool,
 }
 
 impl ClientAccountState {
-    /// Returns a new ClientAccountState from data.
     pub fn new() -> Self {
-        // pub fn new(available: f32, held: f32, total: f32, locked: bool) -> Self {
         ClientAccountState {
             available: 0.0,
             held: 0.0,
@@ -25,7 +26,6 @@ impl ClientAccountState {
         }
     }
 
-    /// Returns the available value.
     pub fn available(&self) -> f32 {
         self.available
     }
@@ -68,23 +68,20 @@ impl ClientAccountState {
     }
 
     /// Locks the client's account during the time of dispute.
-    pub fn lock(&mut self) -> Result<()> {
+    pub fn lock(&mut self) {
         self.locked = true;
-        Ok(())
     }
 
     #[allow(dead_code)]
     /// Locks the client's account during the time of dispute.
-    pub fn unlock(&mut self) -> Result<()> {
+    pub fn unlock(&mut self) {
         self.locked = false;
-        Ok(())
     }
 
     /// Hold value from the client during dispute.
-    pub fn hold(&mut self, x: f32) -> Result<()> {
+    pub fn hold(&mut self, x: f32) {
         self.available -= x;
         self.held += x;
-        Ok(())
     }
 
     // Releases the held funds and add it back to the available
@@ -123,7 +120,7 @@ fn test_add() {
 fn test_hold() {
     let mut cas = ClientAccountState::new();
     cas.add(3.0).unwrap();
-    cas.hold(1.0).unwrap();
+    cas.hold(1.0);
 
     assert_eq!(cas.total(), 3.0);
     assert_eq!(cas.held(), 1.0);
