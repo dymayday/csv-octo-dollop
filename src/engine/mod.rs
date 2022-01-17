@@ -8,7 +8,6 @@ mod record;
 use self::error::EngineErrorKind;
 use db::{client::ClientAccountState, DBError};
 use error::{EngineError, Result};
-use num_format::{Locale, ToFormattedString};
 use protocol::{Transaction, TransactionKind};
 use record::Record;
 
@@ -45,8 +44,6 @@ impl<'a> Engine<'a> {
             return Err(EngineError::new(EngineErrorKind::InvalidHeaders));
         }
 
-        // TODO: Remove this !
-        let mut counter = 0;
         while rdr.read_byte_record(&mut byte_record)? {
             // If the parsing fail, we just simply discard this record.
             if let Ok(record) = Record::from_byterecord(&mut byte_record) {
@@ -64,17 +61,7 @@ impl<'a> Engine<'a> {
                 #[allow(clippy::unused_unit)]
                 ()
             }
-
-            // TODO: Remove this !
-            // println!("{:#?}", self.db.client_db());
-            // println!("\n---------------------------------------------\n");
-            counter += 1;
-            // println!(">> {} ", counter.to_formatted_string(&Locale::en));
-            if counter % 10_000 == 0 {
-                print!("\r>> {} ", counter.to_formatted_string(&Locale::en));
-            }
         }
-        println!();
 
         Ok(())
     }
