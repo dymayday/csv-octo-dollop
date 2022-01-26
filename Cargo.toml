@@ -6,3 +6,6 @@ authors = ["meidhy.demagny@gmail.com"]
 
 [dependencies]
 csv = "1.1.6"
+
+[profile.release]
+debug = true
